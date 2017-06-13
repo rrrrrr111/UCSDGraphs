@@ -111,7 +111,7 @@ public class GraphAdjMatrix extends Graph {
 
         for (int i = 0; i < twoHopsVerticesRow.length; i++) {
             for (int j = 0; j < getNumVertices(); j++) {
-                twoHopsVerticesRow[i] += adjMatrix[v][j] * adjMatrix[i][j];
+                twoHopsVerticesRow[i] += adjMatrix[v][j] * adjMatrix[j][i];
             }
 
             for (int j = 0; j < twoHopsVerticesRow[i]; j++) {

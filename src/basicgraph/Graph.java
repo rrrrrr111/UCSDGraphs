@@ -262,9 +262,9 @@ public abstract class Graph {
         // Test your distance2 code here.
         System.out.println("Testing distance-two methods on sample graphs. Goal: implement method using two approaches.");
         GraphAdjList listGraph = new GraphAdjList();
-        GraphLoader.loadRoadMap("data/testdata/simpletest.map", listGraph);
+        GraphLoader.loadGraph("data/graders/mod1/graph1.txt", listGraph);
         GraphAdjMatrix matrixGraph = new GraphAdjMatrix();
-        GraphLoader.loadRoadMap("data/testdata/simpletest.map", matrixGraph);
+        GraphLoader.loadGraph("data/graders/mod1/graph1.txt", matrixGraph);
 
         for (int i = 0; i < listGraph.getNumVertices(); i++) {
 
