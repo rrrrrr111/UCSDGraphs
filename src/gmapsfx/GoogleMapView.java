@@ -21,9 +21,6 @@ import gmapsfx.javascript.event.MapStateEventType;
 import gmapsfx.javascript.object.GoogleMap;
 import gmapsfx.javascript.object.LatLong;
 import gmapsfx.javascript.object.MapOptions;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CyclicBarrier;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
@@ -32,8 +29,11 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.web.WebView;
 import netscape.javascript.JSObject;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CyclicBarrier;
+
 /**
- *
  * @author Rob Terpilowski
  */
 public class GoogleMapView extends AnchorPane {
@@ -61,18 +61,18 @@ public class GoogleMapView extends AnchorPane {
      * <p>
      * The html page is, at it's simplest:
      * {@code
-	 * <!DOCTYPE html>
+     * <!DOCTYPE html>
      * <html>
-     *   <head>
-     *     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
-     *     <meta charset="utf-8">
-     *     <title>My Map</title>
-     *     <style>
-     *     html, body, #map-canvas {
-     *       height: 100%;
-     *       margin: 0px;
-     *       padding: 0px
-     *     }
+     * <head>
+     * <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+     * <meta charset="utf-8">
+     * <title>My Map</title>
+     * <style>
+     * html, body, #map-canvas {
+     * height: 100%;
+     * margin: 0px;
+     * padding: 0px
+     * }
      * </style>
      * <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
      * </head>
@@ -91,10 +91,10 @@ public class GoogleMapView extends AnchorPane {
      * them in a subpackage "markers" you would create your MarkerOptions object
      * as follows:
      * {@code
-	 * myMarkerOptions.position(myLatLong)
-     *     .title("My Marker")
-     *     .icon("markers/mymarker.png")
-     *     .visible(true);
+     * myMarkerOptions.position(myLatLong)
+     * .title("My Marker")
+     * .icon("markers/mymarker.png")
+     * .visible(true);
      * }
      *
      * @param mapResourcePath
@@ -108,7 +108,7 @@ public class GoogleMapView extends AnchorPane {
      * displayed in the WebView
      *
      * @param mapResourcePath
-     * @param debug true if the FireBug pane should be displayed in the WebView.
+     * @param debug           true if the FireBug pane should be displayed in the WebView.
      */
     public GoogleMapView(String mapResourcePath, boolean debug) {
         String htmlFile;
@@ -285,7 +285,7 @@ public class GoogleMapView extends AnchorPane {
     }
 
     public WebView getWebView() {
-    	return this.webview;
+        return this.webview;
     }
 
 }

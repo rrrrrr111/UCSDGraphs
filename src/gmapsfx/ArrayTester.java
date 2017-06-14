@@ -21,7 +21,6 @@ import gmapsfx.javascript.JavascriptArray;
 import gmapsfx.javascript.JavascriptObject;
 import gmapsfx.javascript.JavascriptRuntime;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
@@ -32,7 +31,6 @@ import javafx.stage.Stage;
 import netscape.javascript.JSObject;
 
 /**
- *
  * @author Geoff Capper
  */
 public class ArrayTester extends Application {
@@ -45,7 +43,7 @@ public class ArrayTester extends Application {
 
         webview = new WebView();
         webengine = new JavaFxWebEngine(webview.getEngine());
-        JavascriptRuntime.setDefaultWebEngine( webengine );
+        JavascriptRuntime.setDefaultWebEngine(webengine);
 
         BorderPane bp = new BorderPane();
         bp.setCenter(webview);

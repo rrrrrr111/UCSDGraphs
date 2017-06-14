@@ -1,9 +1,11 @@
 package mapmaker;
 
+import javax.json.JsonArray;
+import javax.json.JsonNumber;
+import javax.json.JsonObject;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
-import javax.json.*;
 
 public class MapMaker {
     float[] bounds;
@@ -98,5 +100,5 @@ class Location {
     public boolean outsideBounds(float[] bounds) {
         return (lat < bounds[0] || lat > bounds[2] || lon < bounds[1] || lon > bounds[3]);
     }
-        
+
 }
