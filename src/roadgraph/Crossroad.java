@@ -13,7 +13,13 @@ import static java.util.Collections.EMPTY_SET;
  */
 class Crossroad extends GeographicPoint {
 
+    /**
+     * Set of outgoing roads
+     */
     private Set<Road> inRoads = EMPTY_SET;
+    /**
+     * Set of incoming roads
+     */
     private Set<Road> outRoads = EMPTY_SET;
 
     Crossroad(double latitude, double longitude) {
@@ -24,6 +30,9 @@ class Crossroad extends GeographicPoint {
         this(location.getX(), location.getY());
     }
 
+    /**
+     * @return true if this crossroad has loopback road
+     */
     boolean hasLoopBackRoad() {
         for (Road inRoad : inRoads) {
             if (inRoad.isLoopBackRoad()) {
@@ -33,20 +42,32 @@ class Crossroad extends GeographicPoint {
         return false;
     }
 
+    /**
+     * Returns other crossroads connected with this crossroad in one hop outgoing roads
+     */
     Set<Crossroad> getNeighbours() {
         return outRoads.stream()
                 .map(Road::getToCrossroad)
                 .collect(Collectors.toSet());
     }
 
+    /**
+     * Returns incoming roads set
+     */
     Set<Road> getInRoads() {
         return inRoads;
     }
 
+    /**
+     * Returns outgoing roads set
+     */
     Set<Road> getOutRoads() {
         return outRoads;
     }
 
+    /**
+     * Adds outgoing road to crossroad
+     */
     void addOutRoad(Road road) {
         if (outRoads == EMPTY_SET) {
             outRoads = new HashSet<>();
@@ -54,6 +75,9 @@ class Crossroad extends GeographicPoint {
         outRoads.add(road);
     }
 
+    /**
+     * Adds incoming road to crossroad
+     */
     void addInRoad(Road road) {
         if (inRoads == EMPTY_SET) {
             inRoads = new HashSet<>();
@@ -61,6 +85,9 @@ class Crossroad extends GeographicPoint {
         inRoads.add(road);
     }
 
+    /**
+     * Returns text representation of the crossroad as a coordinate
+     */
     String asTextPoint() {
         return String.format("[%s,%s]", x, y);
     }

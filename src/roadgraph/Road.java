@@ -7,11 +7,26 @@ import java.util.Objects;
  */
 class Road {
 
+    /**
+     * Road name
+     */
     private final String roadName;
+    /**
+     * Road type
+     */
     private final String roadType;
+    /**
+     * Road weight
+     */
     private final double length;
 
+    /**
+     * Starting crossroad of the Road
+     */
     private Crossroad fromCrossroad;
+    /**
+     * Ending crossroad of the Road
+     */
     private Crossroad toCrossroad;
 
     Road(String roadName, String roadType, double length) {

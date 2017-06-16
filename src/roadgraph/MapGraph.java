@@ -10,7 +10,6 @@ package roadgraph;
 import geography.GeographicPoint;
 import util.GraphLoader;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -24,7 +23,7 @@ import java.util.function.Consumer;
  * @author UCSD MOOC development team and YOU
  *         <p>
  *         A class which represents a graph of geographic locations
- *         Nodes in the graph are crossroads between
+ *         Nodes in the graph are crossroads between Roads
  */
 public class MapGraph {
 
