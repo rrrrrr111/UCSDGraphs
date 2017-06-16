@@ -11,16 +11,16 @@ import static java.util.Collections.EMPTY_SET;
 /**
  * Implementation of roads intersection (vertices in MapGraph)
  */
-class RoadsIntersection extends GeographicPoint {
+class Crossroad extends GeographicPoint {
 
     private Set<Road> inRoads = EMPTY_SET;
     private Set<Road> outRoads = EMPTY_SET;
 
-    RoadsIntersection(double latitude, double longitude) {
+    Crossroad(double latitude, double longitude) {
         super(latitude, longitude);
     }
 
-    RoadsIntersection(GeographicPoint location) {
+    Crossroad(GeographicPoint location) {
         this(location.getX(), location.getY());
     }
 
@@ -33,9 +33,9 @@ class RoadsIntersection extends GeographicPoint {
         return false;
     }
 
-    Set<RoadsIntersection> getNeighbours() {
+    Set<Crossroad> getNeighbours() {
         return outRoads.stream()
-                .map(Road::getToIntersection)
+                .map(Road::getToCrossroad)
                 .collect(Collectors.toSet());
     }
 
@@ -65,13 +65,19 @@ class RoadsIntersection extends GeographicPoint {
         return String.format("[%s,%s]", x, y);
     }
 
+    String getNeighboursCommaSeparated() {
+        StringBuilder sb = new StringBuilder();
+        for (Road road : outRoads) {
+            sb.append(road.getToCrossroad().asTextPoint()).append(", ");
+        }
+        if (sb.length() == 0) {
+            return "";
+        }
+        return sb.delete(sb.length() - 2, sb.length()).toString();
+    }
+
     @Override
     public String toString() {
-        return "RoadsIntersection{" +
-                "x=" + x +
-                ", y=" + y +
-                ", inRoads=" + inRoads +
-                ", outRoads=" + outRoads +
-                '}';
+        return "Lat: " + getX() + ", Lon: " + getY();
     }
 }

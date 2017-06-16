@@ -37,8 +37,8 @@ public class SearchGrader implements Runnable {
         Thread thread = new Thread(grader);
         thread.start();
 
-        // Allow it to run for 10 seconds
-        long endTime = System.currentTimeMillis() + 10000;
+        // Allow it to run for 1 hour
+        long endTime = System.currentTimeMillis() + 3600_000;
         boolean infinite = false;
         while (thread.isAlive()) {
             if (System.currentTimeMillis() > endTime) {
@@ -114,7 +114,7 @@ public class SearchGrader implements Runnable {
         } else if (corr.path == null) {
             feedback += "FAILED. Your implementation returned \n" + printBFSList(bfs) + "; expected null.";
         } else if (!printBFSList(corr.path).equals(printBFSList(bfs))) {
-            feedback += "FAILED. Expected: \n" + printBFSList(corr.path) + "Got: \n" + printBFSList(bfs);
+            feedback += "FAILED. Expected: \n" + printBFSList(corr.path) + "Got: \n" + printBFSList(bfs) + "\nGraph: " + result;
             if (bfs.size() != corr.path.size()) {
                 feedback += "Your result has size " + bfs.size() + "; expected " + corr.path.size() + ".";
             } else {

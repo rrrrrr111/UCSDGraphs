@@ -2,7 +2,7 @@
  * @author UCSD MOOC development team and YOU
  * <p>
  * A class which reprsents a graph of geographic locations
- * Nodes in the graph are intersections between
+ * Nodes in the graph are crossroads between
  */
 package roadgraph;
 
@@ -11,7 +11,6 @@ import geography.GeographicPoint;
 import util.GraphLoader;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -25,11 +24,11 @@ import java.util.function.Consumer;
  * @author UCSD MOOC development team and YOU
  *         <p>
  *         A class which represents a graph of geographic locations
- *         Nodes in the graph are intersections between
+ *         Nodes in the graph are crossroads between
  */
 public class MapGraph {
 
-    private Set<RoadsIntersection> intersections = new HashSet<>();
+    private Set<Crossroad> crossroads = new HashSet<>();
 
     /**
      * Create a new empty MapGraph
@@ -38,21 +37,21 @@ public class MapGraph {
     }
 
     /**
-     * Get the number of vertices (road intersections) in the graph
+     * Get the number of vertices (road crossroads) in the graph
      *
      * @return The number of vertices in the graph.
      */
     public int getNumVertices() {
-        return intersections.size();
+        return crossroads.size();
     }
 
     /**
-     * Return the intersections, which are the vertices in this graph.
+     * Return the crossroads, which are the vertices in this graph.
      *
      * @return The vertices in this graph as GeographicPoints
      */
     public Set<GeographicPoint> getVertices() {
-        return new HashSet<>(intersections);
+        return new HashSet<>(crossroads);
     }
 
     /**
@@ -62,10 +61,10 @@ public class MapGraph {
      */
     public int getNumEdges() {
         int edgesNum = 0;
-        for (RoadsIntersection intersection : intersections) {
+        for (Crossroad crossroad : crossroads) {
 
-            edgesNum += intersection.getInRoads().size();
-            if (intersection.hasLoopBackRoad()) {
+            edgesNum += crossroad.getInRoads().size();
+            if (crossroad.hasLoopBackRoad()) {
                 edgesNum++;
             }
         }
@@ -85,7 +84,7 @@ public class MapGraph {
         if (location == null) {
             return false;
         }
-        return intersections.add(new RoadsIntersection(location));
+        return crossroads.add(new Crossroad(location));
     }
 
     /**
@@ -106,20 +105,20 @@ public class MapGraph {
 
         Road road = new Road(roadName, roadType, length);
 
-        RoadsIntersection fromIntersection = find(from);
-        RoadsIntersection toIntersection = find(to);
+        Crossroad fromCrossroad = find(from);
+        Crossroad toCrossroad = find(to);
 
-        toIntersection.addInRoad(road);
-        road.setToIntersection(toIntersection);
+        toCrossroad.addInRoad(road);
+        road.setToCrossroad(toCrossroad);
 
-        fromIntersection.addOutRoad(road);
-        road.setFromIntersection(fromIntersection);
+        fromCrossroad.addOutRoad(road);
+        road.setFromCrossroad(fromCrossroad);
     }
 
-    private RoadsIntersection find(GeographicPoint point) {
-        for (RoadsIntersection intersection : intersections) {
-            if (intersection.equals(point)) {
-                return intersection;
+    private Crossroad find(GeographicPoint point) {
+        for (Crossroad crossroad : crossroads) {
+            if (crossroad.equals(point)) {
+                return crossroad;
             }
         }
         throw new IllegalStateException("Intersection in point: " + point + " not found");
@@ -130,7 +129,7 @@ public class MapGraph {
      *
      * @param start The starting location
      * @param goal  The goal location
-     * @return The list of intersections that form the shortest (unweighted)
+     * @return The list of crossroads that form the shortest (unweighted)
      * path from start to goal (including both start and goal).
      */
     public List<GeographicPoint> bfs(GeographicPoint start, GeographicPoint goal) {
@@ -143,60 +142,66 @@ public class MapGraph {
     /**
      * Find the path from start to goal using breadth first search
      *
-     * @param start        The starting location
-     * @param goal         The goal location
-     * @param nodeSearched A hook for visualization.  See assignment instructions for how to use it.
-     * @return The list of intersections that form the shortest (unweighted)
+     * @param start      The starting location
+     * @param goal       The goal location
+     * @param visualiser A hook for visualization.  See assignment instructions for how to use it.
+     * @return The list of crossroads that form the shortest (unweighted)
      * path from start to goal (including both start and goal).
      */
     public List<GeographicPoint> bfs(GeographicPoint start,
-                                     GeographicPoint goal, Consumer<GeographicPoint> nodeSearched) {
+                                     GeographicPoint goal, Consumer<GeographicPoint> visualiser) {
 
-        Map<RoadsIntersection, RoadsIntersection> pathLinks = new HashMap<>();
-        Queue<RoadsIntersection> queue = new LinkedList<>();
+        Map<Crossroad, Crossroad> pathLinks = new HashMap<>();
+        Queue<Crossroad> queue = new LinkedList<>();
+        Crossroad current = find(start);
+        Crossroad goalCrossroad = find(goal);
 
-        RoadsIntersection currentIntersection = find(start);
-        RoadsIntersection goalIntersection = find(goal);
+        while (true) {
+            visualiser.accept(current);
+            if (current.equals(goalCrossroad)) {
+                break;
+            }
 
-        while (!currentIntersection.equals(goalIntersection)) {
+            Set<Crossroad> neighbours = current.getNeighbours();
+            neighbours.removeAll(pathLinks.values());
 
-            Set<RoadsIntersection> neighbours = currentIntersection.getNeighbours();
-            neighbours.removeAll(pathLinks.keySet());
+            for (Crossroad neighbour : neighbours) {
+                pathLinks.put(neighbour, current);
+            }
 
             queue.addAll(neighbours);
+            Crossroad next = queue.poll();
 
-            RoadsIntersection nextIntersection = queue.poll();
-            if (nextIntersection == null) {
-                return Collections.emptyList();
+            if (next == null) {
+                return null;
             }
-            pathLinks.put(currentIntersection, nextIntersection);
-            currentIntersection = nextIntersection;
+
+            current = next;
         }
         return createPath(start, goal, pathLinks);
     }
 
-    private List<GeographicPoint> createPath(GeographicPoint start, GeographicPoint goal,
-                                             Map<RoadsIntersection, RoadsIntersection> pathLinks) {
-        List<GeographicPoint> path = new ArrayList<>();
-        path.add(find(start));
+    private List<GeographicPoint> createPath(GeographicPoint fromPoint, GeographicPoint toPoint,
+                                             Map<Crossroad, Crossroad> pathLinks) {
+        LinkedList<GeographicPoint> path = new LinkedList<>();
+        path.addFirst(find(toPoint));
 
         while (true) {
-            if (start.equals(goal)) {
+            if (fromPoint.equals(toPoint)) {
                 return path;
             }
-            RoadsIntersection next = pathLinks.get(start);
-            path.add(next);
-            start = next;
+            Crossroad next = pathLinks.get(toPoint);
+            path.addFirst(next);
+            toPoint = next;
         }
     }
-
 
     /**
      * Find the path from start to goal using Dijkstra's algorithm
      *
      * @param start The starting location
      * @param goal  The goal location
-     * @return The list of intersections that form the shortest path from
+     * @return The list of crossroads that form the shortest path from
      * start to goal (including both start and goal).
      */
     public List<GeographicPoint> dijkstra(GeographicPoint start, GeographicPoint goal) {
@@ -213,7 +218,7 @@ public class MapGraph {
      * @param start        The starting location
      * @param goal         The goal location
      * @param nodeSearched A hook for visualization.  See assignment instructions for how to use it.
-     * @return The list of intersections that form the shortest path from
+     * @return The list of crossroads that form the shortest path from
      * start to goal (including both start and goal).
      */
     public List<GeographicPoint> dijkstra(GeographicPoint start,
@@ -231,7 +236,7 @@ public class MapGraph {
      *
      * @param start The starting location
      * @param goal  The goal location
-     * @return The list of intersections that form the shortest path from
+     * @return The list of crossroads that form the shortest path from
      * start to goal (including both start and goal).
      */
     public List<GeographicPoint> aStarSearch(GeographicPoint start, GeographicPoint goal) {
@@ -247,7 +252,7 @@ public class MapGraph {
      * @param start        The starting location
      * @param goal         The goal location
      * @param nodeSearched A hook for visualization.  See assignment instructions for how to use it.
-     * @return The list of intersections that form the shortest path from
+     * @return The list of crossroads that form the shortest path from
      * start to goal (including both start and goal).
      */
     public List<GeographicPoint> aStarSearch(GeographicPoint start,
@@ -260,6 +265,18 @@ public class MapGraph {
         return null;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("MapGraph[\n");
+        for (Crossroad crossroad : crossroads) {
+            sb.append('\t')
+                    .append(crossroad.asTextPoint())
+                    .append(" -> [")
+                    .append(crossroad.getNeighboursCommaSeparated())
+                    .append("]\n");
+        }
+        return sb.append("]\n").toString();
+    }
 
     public static void main(String[] args) {
         System.out.print("Making a new map...");
@@ -270,8 +287,8 @@ public class MapGraph {
 
         // You can use this method for testing.
 
-		
-		/* Here are some test cases you should try before you attempt 
+
+		/* Here are some test cases you should try before you attempt
          * the Week 3 End of Week Quiz, EVEN IF you score 100% on the
 		 * programming assignment.
 		 */

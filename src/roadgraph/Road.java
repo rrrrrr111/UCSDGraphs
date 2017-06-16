@@ -11,8 +11,8 @@ class Road {
     private final String roadType;
     private final double length;
 
-    private RoadsIntersection fromIntersection;
-    private RoadsIntersection toIntersection;
+    private Crossroad fromCrossroad;
+    private Crossroad toCrossroad;
 
     Road(String roadName, String roadType, double length) {
         this.roadName = roadName;
@@ -21,7 +21,7 @@ class Road {
     }
 
     boolean isLoopBackRoad() {
-        return fromIntersection.equals(toIntersection);
+        return fromCrossroad.equals(toCrossroad);
     }
 
     String getRoadName() {
@@ -36,20 +36,20 @@ class Road {
         return length;
     }
 
-    RoadsIntersection getFromIntersection() {
-        return fromIntersection;
+    Crossroad getFromCrossroad() {
+        return fromCrossroad;
     }
 
-    void setFromIntersection(RoadsIntersection fromIntersection) {
-        this.fromIntersection = fromIntersection;
+    void setFromCrossroad(Crossroad fromCrossroad) {
+        this.fromCrossroad = fromCrossroad;
     }
 
-    RoadsIntersection getToIntersection() {
-        return toIntersection;
+    Crossroad getToCrossroad() {
+        return toCrossroad;
     }
 
-    void setToIntersection(RoadsIntersection toIntersection) {
-        this.toIntersection = toIntersection;
+    void setToCrossroad(Crossroad toCrossroad) {
+        this.toCrossroad = toCrossroad;
     }
 
     @Override
@@ -60,13 +60,13 @@ class Road {
         return Double.compare(road.length, length) == 0 &&
                 Objects.equals(roadName, road.roadName) &&
                 Objects.equals(roadType, road.roadType) &&
-                Objects.equals(fromIntersection, road.fromIntersection) &&
-                Objects.equals(toIntersection, road.toIntersection);
+                Objects.equals(fromCrossroad, road.fromCrossroad) &&
+                Objects.equals(toCrossroad, road.toCrossroad);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(roadName, roadType, length, fromIntersection, toIntersection);
+        return Objects.hash(roadName, roadType, length, fromCrossroad, toCrossroad);
     }
 
     @Override
@@ -75,8 +75,8 @@ class Road {
                 "roadName='" + roadName + '\'' +
                 ", roadType='" + roadType + '\'' +
                 ", length=" + length +
-                ", fromIntersection=" + fromIntersection.asTextPoint() +
-                ", toIntersection=" + toIntersection.asTextPoint() +
+                ", fromCrossroad=" + fromCrossroad.asTextPoint() +
+                ", toCrossroad=" + toCrossroad.asTextPoint() +
                 '}';
     }
 }
