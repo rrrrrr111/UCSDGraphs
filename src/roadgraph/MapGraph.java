@@ -27,7 +27,7 @@ import java.util.function.Consumer;
  */
 public class MapGraph {
 
-    private Set<Crossroad> crossroads = new HashSet<>();
+    private Map<GeographicPoint, Crossroad> crossroads = new HashMap<>();
 
     /**
      * Create a new empty MapGraph
@@ -50,7 +50,7 @@ public class MapGraph {
      * @return The vertices in this graph as GeographicPoints
      */
     public Set<GeographicPoint> getVertices() {
-        return new HashSet<>(crossroads);
+        return new HashSet<>(crossroads.values());
     }
 
     /**
@@ -60,7 +60,7 @@ public class MapGraph {
      */
     public int getNumEdges() {
         int edgesNum = 0;
-        for (Crossroad crossroad : crossroads) {
+        for (Crossroad crossroad : crossroads.values()) {
 
             edgesNum += crossroad.getInRoads().size();
             if (crossroad.hasLoopBackRoad()) {
@@ -80,10 +80,11 @@ public class MapGraph {
      * was already in the graph, or the parameter is null).
      */
     public boolean addVertex(GeographicPoint location) {
-        if (location == null) {
+        if (location == null || crossroads.containsKey(location)) {
             return false;
         }
-        return crossroads.add(new Crossroad(location));
+        crossroads.put(location, new Crossroad(location));
+        return true;
     }
 
     /**
@@ -115,12 +116,12 @@ public class MapGraph {
     }
 
     private Crossroad find(GeographicPoint point) {
-        for (Crossroad crossroad : crossroads) {
-            if (crossroad.equals(point)) {
-                return crossroad;
-            }
+        Crossroad crossroad = crossroads.get(point);
+        if (crossroad == null) {
+            throw new IllegalStateException("Crossroad in point: " + point + " not found");
         }
-        throw new IllegalStateException("Intersection in point: " + point + " not found");
+        return crossroad;
+
     }
 
     /**
@@ -267,7 +268,7 @@ public class MapGraph {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("MapGraph[\n");
-        for (Crossroad crossroad : crossroads) {
+        for (Crossroad crossroad : crossroads.values()) {
             sb.append('\t')
                     .append(crossroad.asTextPoint())
                     .append(" -> [")
