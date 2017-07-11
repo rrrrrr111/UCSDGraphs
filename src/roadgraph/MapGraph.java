@@ -62,7 +62,7 @@ public class MapGraph {
         int edgesNum = 0;
         for (Crossroad crossroad : crossroads.values()) {
 
-            edgesNum += crossroad.getInRoads().size();
+            edgesNum += crossroad.getOutRoads().size();
             if (crossroad.hasLoopBackRoad()) {
                 edgesNum++;
             }
