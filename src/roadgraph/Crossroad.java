@@ -30,6 +30,12 @@ class Crossroad extends GeographicPoint {
         this(location.getX(), location.getY());
     }
 
+    protected Crossroad(Crossroad crossroad) {
+        this((GeographicPoint) crossroad);
+        inRoads = crossroad.getInRoads();
+        outRoads = crossroad.getOutRoads();
+    }
+
     /**
      * @return true if this crossroad has loopback road
      */

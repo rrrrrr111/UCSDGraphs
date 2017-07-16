@@ -10,14 +10,10 @@ package roadgraph;
 import geography.GeographicPoint;
 import util.GraphLoader;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
+
+import static java.lang.Double.compare;
 
 /**
  * @author UCSD MOOC development team and YOU
@@ -178,11 +174,11 @@ public class MapGraph {
 
             current = next;
         }
-        return createPath(start, goal, pathLinks);
+        return createPathOnReverseLinks(start, goal, pathLinks);
     }
 
-    private List<GeographicPoint> createPath(GeographicPoint fromPoint, GeographicPoint toPoint,
-                                             Map<Crossroad, Crossroad> pathLinks) {
+    private List<GeographicPoint> createPathOnReverseLinks(GeographicPoint fromPoint, GeographicPoint toPoint,
+                                                           Map<Crossroad, Crossroad> pathLinks) {
         LinkedList<GeographicPoint> path = new LinkedList<>();
         path.addFirst(find(toPoint));
 
@@ -215,20 +211,57 @@ public class MapGraph {
     /**
      * Find the path from start to goal using Dijkstra's algorithm
      *
-     * @param start        The starting location
-     * @param goal         The goal location
-     * @param nodeSearched A hook for visualization.  See assignment instructions for how to use it.
+     * @param start      The starting location
+     * @param goal       The goal location
+     * @param visualiser A hook for visualization.  See assignment instructions for how to use it.
      * @return The list of crossroads that form the shortest path from
      * start to goal (including both start and goal).
      */
     public List<GeographicPoint> dijkstra(GeographicPoint start,
-                                          GeographicPoint goal, Consumer<GeographicPoint> nodeSearched) {
-        // TODO: Implement this method in WEEK 4
+                                          GeographicPoint goal, Consumer<GeographicPoint> visualiser) {
+        Map<Crossroad, DistancedFromStartCrossroad> fromTo = new HashMap<>();
+        PriorityQueue<DistancedFromStartCrossroad> queue = new PriorityQueue<>();
 
-        // Hook for visualization.  See writeup.
-        //nodeSearched.accept(next.getLocation());
+        DistancedFromStartCrossroad current = new DistancedFromStartCrossroad(find(start), 0L);
+        Crossroad goalCrossroad = find(goal);
 
-        return null;
+        queue.add(current);
+
+        while ((current = queue.poll()) != null) {
+            visualiser.accept(current);
+
+            if (current.equals(goalCrossroad)) {
+                break;
+            }
+
+            double distanceFromStart = current.getDistanceFromStart();
+            for (Road outRoad : current.getOutRoads()) {
+                DistancedFromStartCrossroad neighbour = new DistancedFromStartCrossroad(
+                        outRoad.getToCrossroad(), distanceFromStart + outRoad.getLength()
+                );
+
+                if (!fromTo.containsKey(current) || neighbour.closerToStartThan(fromTo.get(current))) {
+                    fromTo.put(current, neighbour);
+                    queue.add(neighbour);
+                }
+            }
+        }
+        return createPath(start, goal, fromTo);
+    }
+
+    private List<GeographicPoint> createPath(GeographicPoint fromPoint, GeographicPoint toPoint,
+                                     Map<Crossroad, ? extends Crossroad> pathLinks) {
+        LinkedList<GeographicPoint> path = new LinkedList<>();
+        path.addFirst(fromPoint);
+
+        while (true) {
+            if (fromPoint.equals(toPoint)) {
+                return path;
+            }
+            Crossroad neighbour = pathLinks.get(fromPoint);
+            path.add(neighbour);
+            fromPoint = neighbour;
+        }
     }
 
     /**
@@ -335,5 +368,27 @@ public class MapGraph {
 
         List<GeographicPoint> route = theMap.dijkstra(start, end);
         List<GeographicPoint> route2 = theMap.aStarSearch(start, end);
+    }
+
+    private static class DistancedFromStartCrossroad extends Crossroad implements Comparable<DistancedFromStartCrossroad> {
+        private final double distanceFromStart;
+
+        DistancedFromStartCrossroad(Crossroad crossroad, double distanceFromStart) {
+            super(crossroad);
+            this.distanceFromStart = distanceFromStart;
+        }
+
+        private double getDistanceFromStart() {
+            return distanceFromStart;
+        }
+
+        private boolean closerToStartThan(DistancedFromStartCrossroad crossroad) {
+            return this.distanceFromStart < crossroad.getDistanceFromStart();
+        }
+
+        @Override
+        public int compareTo(DistancedFromStartCrossroad o) {
+            return compare(distanceFromStart, o.distanceFromStart);
+        }
     }
 }
