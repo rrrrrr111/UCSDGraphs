@@ -174,11 +174,11 @@ public class MapGraph {
 
             current = next;
         }
-        return createPathOnReverseLinks(start, goal, pathLinks);
+        return buildPath(start, goal, pathLinks);
     }
 
-    private List<GeographicPoint> createPathOnReverseLinks(GeographicPoint fromPoint, GeographicPoint toPoint,
-                                                           Map<Crossroad, Crossroad> pathLinks) {
+    private List<GeographicPoint> buildPath(GeographicPoint fromPoint, GeographicPoint toPoint,
+                                            Map<? extends Crossroad, ? extends Crossroad> pathLinks) {
         LinkedList<GeographicPoint> path = new LinkedList<>();
         path.addFirst(find(toPoint));
 
@@ -219,15 +219,16 @@ public class MapGraph {
      */
     public List<GeographicPoint> dijkstra(GeographicPoint start,
                                           GeographicPoint goal, Consumer<GeographicPoint> visualiser) {
-        Map<Crossroad, DistancedFromStartCrossroad> fromTo = new HashMap<>();
+        Map<DistancedFromStartCrossroad, DistancedFromStartCrossroad> fromTo = new HashMap<>();
         PriorityQueue<DistancedFromStartCrossroad> queue = new PriorityQueue<>();
 
-        DistancedFromStartCrossroad current = new DistancedFromStartCrossroad(find(start), 0L);
+        DistancedFromStartCrossroad current = new DistancedFromStartCrossroad(find(start), 0);
         Crossroad goalCrossroad = find(goal);
 
         queue.add(current);
 
-        while ((current = queue.poll()) != null) {
+        for (; ; ) {
+            current = queue.poll();
             visualiser.accept(current);
 
             if (current.equals(goalCrossroad)) {
@@ -240,28 +241,27 @@ public class MapGraph {
                         outRoad.getToCrossroad(), distanceFromStart + outRoad.getLength()
                 );
 
-                if (!fromTo.containsKey(current) || neighbour.closerToStartThan(fromTo.get(current))) {
-                    fromTo.put(current, neighbour);
+
+                if (!fromTo.containsKey(neighbour)) {
+                    fromTo.put(neighbour, current);
                     queue.add(neighbour);
+
+                } else {
+                    for (Map.Entry<DistancedFromStartCrossroad, DistancedFromStartCrossroad> entry : fromTo.entrySet()) {
+
+                        DistancedFromStartCrossroad previousNeighbour = entry.getKey();
+
+                        if (previousNeighbour.equals(neighbour)
+                                && neighbour.closerToStartThan(previousNeighbour)) {
+
+                            fromTo.put(neighbour, current);
+                            queue.add(neighbour);
+                        }
+                    }
                 }
             }
         }
-        return createPath(start, goal, fromTo);
-    }
-
-    private List<GeographicPoint> createPath(GeographicPoint fromPoint, GeographicPoint toPoint,
-                                     Map<Crossroad, ? extends Crossroad> pathLinks) {
-        LinkedList<GeographicPoint> path = new LinkedList<>();
-        path.addFirst(fromPoint);
-
-        while (true) {
-            if (fromPoint.equals(toPoint)) {
-                return path;
-            }
-            Crossroad neighbour = pathLinks.get(fromPoint);
-            path.add(neighbour);
-            fromPoint = neighbour;
-        }
+        return buildPath(start, goal, fromTo);
     }
 
     /**
