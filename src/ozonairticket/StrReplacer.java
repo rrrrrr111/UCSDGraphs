@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
  */
 public class StrReplacer {
 
+    private static final String ORDER_NUM = "05699332-0012";
+
     public static void main(String[] args) throws Exception {
 
         prepareToVilnus();
@@ -23,14 +25,16 @@ public class StrReplacer {
         replacings.put("Churganova Uliana Ms", "Churganov Roman Mr");
         replacings.put("VIK515271", "715918371");
         replacings.put("Shchukina Irina Ms", "Shchukina Irina Ms");
-        replacings.put("4614807193", "4614807193");
+        replacings.put("4614807193", "652266149");
     }
 
     private static void prepareToVilnus() throws IOException {
         Map<String, String> replacings = new LinkedHashMap<>();
 
-        replacings.put("05679331-0008", "05699332-0012");
+        replacings.put("05679331-0008", ORDER_NUM);
         replacings.put("262-4980492974", "262-4977492374");
+        replacings.put("262-4980492975", "262-4977492375");
+
         replacings.put("Авиакомпания U6/NKBAKU; (Amadeus NKBAKU)", "Авиакомпания U6/NKBAKU; (Amadeus NKBAKU)");
         replacings.put("Airline U6/NKBAKU; (Amadeus NKBAKU)", "Airline U6/NKBAKU; (Amadeus NKBAKU)");
 
@@ -61,14 +65,21 @@ public class StrReplacer {
         replacings.put("Белавиа, eco", "Belavia, eco");
         replacings.put("marker=\"en\">Белавиа", "marker=\"en\">Belavia");
 
+        replacings.put("2590.00", "3450.00");
+        replacings.put("1350.00", "1550.00");
+        replacings.put("4140.00", "5000.00");
+        replacings.put("376.36", "454.55");
+        replacings.put("4125.00", "4985.00");
+
         copyTemplate("_toVilnus", replacings);
     }
 
     private static void prepareFromVilnus() throws IOException {
         Map<String, String> replacings = new LinkedHashMap<>();
 
-        replacings.put("05679331-0008", "05699332-0012");
-        replacings.put("262-4980492974", "262-4977492375");
+        replacings.put("05679331-0008", ORDER_NUM);
+        replacings.put("262-4980492974", "262-4977492376");
+        replacings.put("262-4980492975", "262-4977492377");
         replacings.put("Авиакомпания U6/NKBAKU; (Amadeus NKBAKU)", "Авиакомпания U6/NKBAKU; (Amadeus NKBAKU)");
         replacings.put("Airline U6/NKBAKU; (Amadeus NKBAKU)", "Airline U6/NKBAKU; (Amadeus NKBAKU)");
 
@@ -99,12 +110,24 @@ public class StrReplacer {
         replacings.put("Белавиа, eco", "Belavia, eco");
         replacings.put("marker=\"en\">Белавиа", "marker=\"en\">Belavia");
 
+        replacings.put("3450.00", "2670.00");
+        replacings.put("1550.00", "1350.00");
+        replacings.put("5000.00", "4020.00");
+        replacings.put("454.55", "347.10");
+        replacings.put("4985.00", "4005.00");
+
+        replacings.put("2590.00", "2670.00");
+        replacings.put("1350.00", "1350.00");
+        replacings.put("4140.00", "4020.00");
+        replacings.put("376.36", "347.10");
+        replacings.put("4125.00", "4005.00");
+
         copyTemplate("_fromVilnus", replacings);
     }
 
     private static void copyTemplate(String suff, Map<String, String> replacings) throws IOException {
-        String dir = "C:\\Users\\Roman\\Desktop\\визы_литва\\до литвы";
-        String filename = "Gmail - Маршрут-квитанция по заказу № 05679331-0008 в интернет-магазине путешествий OZON.travel";
+        String dir = "C:\\Users\\Roman\\Desktop\\визы_литва\\подтверждение брони";
+        String filename = "Gmail - Маршрут-квитанция по заказу № " + ORDER_NUM + " в интернет-магазине путешествий OZON.travel";
         String suffix = ".html";
 
         List<String> resLines =
