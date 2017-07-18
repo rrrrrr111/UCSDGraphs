@@ -87,11 +87,10 @@ class Road {
     @Override
     public String toString() {
         return "Road{" +
-                "roadName='" + roadName + '\'' +
-                ", roadType='" + roadType + '\'' +
-                ", length=" + length +
-                ", fromCrossroad=" + fromCrossroad.asTextPoint() +
-                ", toCrossroad=" + toCrossroad.asTextPoint() +
+                "'" + roadName + '\'' +
+                " l=" + length +
+                " " + fromCrossroad.asTextPoint() +
+                "->" + toCrossroad.asTextPoint() +
                 '}';
     }
 }

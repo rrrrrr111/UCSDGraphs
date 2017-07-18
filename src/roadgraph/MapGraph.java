@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import static java.lang.Double.compare;
@@ -210,11 +211,15 @@ public class MapGraph {
     public List<GeographicPoint> dijkstra(GeographicPoint start, GeographicPoint goal) {
         // Dummy variable for calling the search algorithms
         // You do not need to change this method.
+        AtomicInteger counter = new AtomicInteger();
         Consumer<GeographicPoint> temp = (x) -> {
 
-            System.out.println("DIJKSTRA visiting [" + x + "] intersects streets: " + ((Crossroad)x).getOutRoads());
+            //System.out.println("DIJKSTRA visiting [" + x + "] intersects streets: " + ((Crossroad) x).getOutRoads());
+            counter.incrementAndGet();
         };
-        return dijkstra(start, goal, temp);
+        List<GeographicPoint> path = dijkstra(start, goal, temp);
+        System.out.println("DIJKSTRA " + counter.get() + " nodes visited");
+        return path;
     }
 
     /**
@@ -250,14 +255,18 @@ public class MapGraph {
                         outRoad.getToCrossroad(), distanceFromStart + outRoad.getLength()
                 );
 
-                checkNeighbour(fromTo, queue, current, neighbour);
+                checkNeighbour(start, fromTo, queue, current, neighbour);
             }
         }
         return buildPath(start, goal, fromTo);
     }
 
-    private void checkNeighbour(Map<PriorityCrossroad, PriorityCrossroad> fromTo, PriorityQueue<PriorityCrossroad> queue, PriorityCrossroad current, PriorityCrossroad neighbour) {
-        if (!fromTo.containsKey(neighbour)) {
+    private void checkNeighbour(GeographicPoint start, Map<PriorityCrossroad, PriorityCrossroad> fromTo,
+                                PriorityQueue<PriorityCrossroad> queue,
+                                PriorityCrossroad current,
+                                PriorityCrossroad neighbour) {
+        if (!fromTo.containsKey(neighbour)
+                && !start.equals(neighbour)) {
             fromTo.put(neighbour, current);
             queue.add(neighbour);
 
@@ -267,7 +276,8 @@ public class MapGraph {
                 PriorityCrossroad previousNeighbour = entry.getKey();
 
                 if (previousNeighbour.equals(neighbour)
-                        && neighbour.hasHigherPriorityThan(previousNeighbour)) {
+                        && neighbour.hasHigherPriorityThan(previousNeighbour)
+                        && !start.equals(neighbour)) {
 
                     fromTo.put(neighbour, current);
                     queue.add(neighbour);
@@ -287,11 +297,16 @@ public class MapGraph {
      */
     public List<GeographicPoint> aStarSearch(GeographicPoint start, GeographicPoint goal) {
         // Dummy variable for calling the search algorithms
+        AtomicInteger counter = new AtomicInteger();
         Consumer<GeographicPoint> temp = (x) -> {
 
-            System.out.println("A* visiting [" + x + "] intersects streets: " + ((Crossroad)x).getOutRoads());
+            //System.out.println("A* visiting [" + x + "] intersects streets: " + ((Crossroad) x).getOutRoads());
+            counter.incrementAndGet();
         };
-        return aStarSearch(start, goal, temp);
+
+        List<GeographicPoint> path = aStarSearch(start, goal, temp);
+        System.out.println("A* " + counter.get() + " nodes visited");
+        return path;
     }
 
     /**
@@ -324,12 +339,10 @@ public class MapGraph {
             double distanceFromStart = current.getDistance();
             for (Road outRoad : current.getOutRoads()) {
                 PriorityCrossroad neighbour = new PriorityCrossroad(
-                        outRoad.getToCrossroad(), distanceFromStart + outRoad.getLength() +
-                        calculateLengthBetween(outRoad.getToCrossroad(), goalCrossroad)
+                        outRoad.getToCrossroad(), calculateLengthBetween(outRoad.getToCrossroad(), goalCrossroad)
                 );
 
-
-                checkNeighbour(fromTo, queue, current, neighbour);
+                checkNeighbour(start, fromTo, queue, current, neighbour);
             }
         }
         return buildPath(start, goal, fromTo);
@@ -396,13 +409,10 @@ public class MapGraph {
         GeographicPoint testStart = new GeographicPoint(1.0, 1.0);
         GeographicPoint testEnd = new GeographicPoint(8.0, -1.0);
 
+        List<GeographicPoint> result;
         System.out.println("Test 1 using simpletest: Dijkstra should be 9 and AStar should be 5");
-
-        List<GeographicPoint> result = simpleTestMap.dijkstra(testStart, testEnd);
-        check(result, 9);
+        result = simpleTestMap.dijkstra(testStart, testEnd);
         result = simpleTestMap.aStarSearch(testStart, testEnd);
-        check(result, 5);
-
 
         MapGraph testMap = new MapGraph();
         GraphLoader.loadRoadMap("data/maps/utc.map", testMap);
@@ -412,20 +422,14 @@ public class MapGraph {
         testEnd = new GeographicPoint(32.869255, -117.216927);
         System.out.println("Test 2 using utc: Dijkstra should be 13 and AStar should be 5");
         result = testMap.dijkstra(testStart, testEnd);
-        check(result, 13);
         result = testMap.aStarSearch(testStart, testEnd);
-        check(result, 5);
-
 
         // A slightly more complex test using real data
         testStart = new GeographicPoint(32.8674388, -117.2190213);
         testEnd = new GeographicPoint(32.8697828, -117.2244506);
         System.out.println("Test 3 using utc: Dijkstra should be 37 and AStar should be 10");
         result = testMap.dijkstra(testStart, testEnd);
-        check(result, 37);
         result = testMap.aStarSearch(testStart, testEnd);
-        check(result, 10);
-
 
 		/* Use this code in Week 3 End of Week Quiz */
         MapGraph theMap = new MapGraph();
@@ -438,11 +442,5 @@ public class MapGraph {
 
         List<GeographicPoint> route = theMap.dijkstra(start, end);
         List<GeographicPoint> route2 = theMap.aStarSearch(start, end);
-    }
-
-    private static void check(List<GeographicPoint> result, int resultSize) {
-        if (result.size() != resultSize) {
-            throw new RuntimeException("The algorithm should give " + resultSize + ", but gave: " + result.size() + ", result path:" + result);
-        }
     }
 }
